@@ -92,17 +92,17 @@ get_header();
   </div>
 </div>
 
-
 <div class="hero-slider">
   <div data-glide-el="track" class="glide__track">
     <div class="glide__slides">
       <?php
-      // Lấy hai bài viết mới nhất từ danh mục "events"
+      // Lấy hai bài viết mới nhất từ danh mục "slides"
       $args = array(
         'post_type' => 'post', // Chỉ lấy bài viết thường, bạn có thể thay đổi thành loại bài viết khác nếu cần
         'orderby' => 'date', // Sắp xếp theo ngày đăng bài viết
         'order' => 'DESC', // Sắp xếp giảm dần, từ bài viết mới nhất đến cũ nhất
-        'category_name' => 'slides' // Chỉ lấy bài viết từ danh mục "events"
+        'category_name' => 'slides', // Chỉ lấy bài viết từ danh mục "slides"
+        'posts_per_page' => 2 // Lấy hai bài viết mới nhất
       );
 
       $query = new WP_Query($args);
@@ -110,8 +110,7 @@ get_header();
       if ($query->have_posts()) :
         while ($query->have_posts()) : $query->the_post();
       ?>
-
-          <div class="hero-slider__slide" style="background-image: url('<?php the_post_thumbnail_url('large'); ?>')">
+          <div class="hero-slider__slide" style="background-image: url('<?php echo esc_url(get_the_post_thumbnail_url(get_the_ID(), 'large')); ?>');">
             <div class="hero-slider__interior container">
               <div class="hero-slider__overlay">
                 <h2 class="headline headline--medium t-center"><?php the_title(); ?></h2>
@@ -126,9 +125,10 @@ get_header();
       wp_reset_postdata();
       ?>
     </div>
-    <div class="slider__bullets glide__bullets" data-glide-el="controls[nav]"></div>
+    <div class="glide__bullets slider__bullets" data-glide-el="controls[nav]"></div>
   </div>
 </div>
+
 
 
 <?php

@@ -5,6 +5,7 @@ function theme_style()
 {
 
 	// get_stylesheet_directory_uri
+	
 
 	wp_enqueue_style('index_university_font_google', "https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i");
 	wp_enqueue_style('index_university_bootstrap', "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
@@ -27,3 +28,4 @@ if ( ! function_exists( 'mytheme_register_nav_menu' ) ) {
 	}
 	add_action( 'after_setup_theme', 'mytheme_register_nav_menu', 0 );
 }
+add_theme_support('post-thumbnails');

@@ -13,9 +13,9 @@
     <div class="container">
       <h1 class="school-logo-text float-left">
         <?php 
-          $sitename =  get_bloginfo('title'); 
+          $siteName =  get_bloginfo('title'); 
          ?>
-        <a href="#"><?php echo $sitename; ?></a>
+        <a href="http://localhost/university/"><?php echo $siteName; ?></a>
       </h1>
       <span class="js-search-trigger site-header__search-trigger"><i class="fa fa-search" aria-hidden="true"></i></span>
       <i class="site-header__menu-trigger fa fa-bars" aria-hidden="true"></i>

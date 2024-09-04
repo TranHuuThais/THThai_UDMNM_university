@@ -19,36 +19,57 @@ get_header();
     <div class="full-width-split__inner">
       <h2 class="headline headline--small-plus t-center">Upcoming Events</h2>
       <?php
-      // Lấy hai bài viết mới nhất từ danh mục "events"
+      // Thay đổi truy vấn để lấy các sự kiện sắp tới
       $args = array(
-        'post_type' => 'post', // Chỉ lấy bài viết thường, bạn có thể thay đổi thành loại bài viết khác nếu cần
-        'posts_per_page' => 2, // Lấy hai bài viết
-        'orderby' => 'date', // Sắp xếp theo ngày đăng bài viết
-        'order' => 'DESC', // Sắp xếp giảm dần, từ bài viết mới nhất đến cũ nhất
-        'category_name' => 'events' // Chỉ lấy bài viết từ danh mục "events"
+        'post_type' => 'event', // Chọn Custom Post Type là 'event'
+        'posts_per_page' => 2, // Hiển thị 2 sự kiện
+        'meta_key' => 'event_date', // Sử dụng trường meta 'event_date' để sắp xếp
+        'orderby' => 'meta_value', // Sắp xếp theo giá trị của trường meta
+        'order' => 'ASC', // Sắp xếp theo thứ tự tăng dần
+        'meta_query' => array(
+          array(
+            'key' => 'event_date', // Trường meta để so sánh là 'event_date'
+            'value' => date('Y-m-d'), // Lấy giá trị là ngày hôm nay
+            'compare' => '>=', // So sánh để lấy các sự kiện diễn ra từ hôm nay trở về sau
+            'type' => 'DATE' // Đặt kiểu dữ liệu là DATE để so sánh đúng
+          ),
+        ),
       );
 
+      // Tạo truy vấn mới với các tham số đã thiết lập
       $query = new WP_Query($args);
 
+      // Kiểm tra nếu có bài viết trong truy vấn
       if ($query->have_posts()) :
+        // Lặp qua từng bài viết trong kết quả truy vấn
         while ($query->have_posts()) : $query->the_post();
+          // Lấy giá trị của trường meta 'event_date' cho bài viết hiện tại
+          $event_date = get_post_meta(get_the_ID(), 'event_date', true);
       ?>
-
           <div class="event-summary">
             <a class="event-summary__date t-center" href="#">
-              <span class="event-summary__month"><?php the_time('M') ?></span>
-              <span class="event-summary__day"><?php the_time('d') ?></span>
+              <span class="event-summary__month"><?php echo date('M', strtotime($event_date)); ?></span>
+              <span class="event-summary__day"><?php echo date('d', strtotime($event_date)); ?></span>
             </a>
             <div class="event-summary__content">
-              <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
-              <p><?php the_excerpt(); ?> <a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a></p>
+              <h5 class="event-summary__title headline headline--tiny">
+                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+              </h5>
+              <p><?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?> <a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a></p>
+            
+             
             </div>
           </div>
+
       <?php
-        endwhile;
-      endif;
+        endwhile; // Kết thúc vòng lặp
+      endif; // Kết thúc kiểm tra bài viết
+
+      // Đặt lại dữ liệu bài viết sau khi hoàn thành truy vấn
       wp_reset_postdata();
       ?>
+
+
 
 
       <p class="t-center no-margin"><a href="#" class="btn btn--blue">View All Events</a></p>
@@ -77,9 +98,10 @@ get_header();
             </a>
             <div class="event-summary__content">
               <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
-              <p><?php the_excerpt(); ?> <a href="<?php the_permalink(); ?>" class="nu gray">Read more</a></p>
+              <p><?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?> <a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a></p>
             </div>
           </div>
+          
       <?php
         endwhile;
       endif;
@@ -102,7 +124,7 @@ get_header();
         'orderby' => 'date', // Sắp xếp theo ngày đăng bài viết
         'order' => 'DESC', // Sắp xếp giảm dần, từ bài viết mới nhất đến cũ nhất
         'category_name' => 'slides', // Chỉ lấy bài viết từ danh mục "slides"
-        'posts_per_page' => 2 // Lấy hai bài viết mới nhất
+        // 'posts_per_page' => 2 // Lấy hai bài viết mới nhất
       );
 
       $query = new WP_Query($args);
@@ -114,8 +136,8 @@ get_header();
             <div class="hero-slider__interior container">
               <div class="hero-slider__overlay">
                 <h2 class="headline headline--medium t-center"><?php the_title(); ?></h2>
-                <p class="t-center"><?php the_excerpt(); ?></p>
-                <p class="t-center no-margin"><a href="<?php the_permalink(); ?>" class="btn btn--blue">Learn more</a></p>
+                <h3 class="t-center"><?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?></>
+                  <p class="t-center no-margin"><a href="<?php the_permalink(); ?>" class="btn btn--blue">Learn more</a></p>
               </div>
             </div>
           </div>

@@ -6,29 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <?php wp_head(); ?>
+ 
 </head>
 
 <body>
   <header class="site-header">
     <div class="container">
       <h1 class="school-logo-text float-left">
-        <?php 
-          $siteName =  get_bloginfo('title'); 
-         ?>
-        <a href="http://localhost/university/"><?php echo $siteName; ?></a>
+        <?php
+        $sitename = get_bloginfo('title');
+        $fictional = explode(" ", $sitename);
+        ?>
+        <a href="#"><strong><?php echo $fictional[0]; ?></strong> <?php echo $fictional[1]; ?></a>
       </h1>
+
       <span class="js-search-trigger site-header__search-trigger"><i class="fa fa-search" aria-hidden="true"></i></span>
       <i class="site-header__menu-trigger fa fa-bars" aria-hidden="true"></i>
-      <div class="site-header__menu group">
-        <!-- <nav class="main-navigation">
-            <ul>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">Programs</a></li>
-              <li><a href="#">Events</a></li>
-              <li><a href="#">Campuses</a></li>
-              <li><a href="#">Blog</a></li>
-            </ul>
-          </nav> -->
+      <div class="site-header__menu group menu-container">
         <?php
         wp_nav_menu(array(
           'theme_location' => 'primary_menu',
@@ -45,5 +39,19 @@
         </div>
       </div>
     </div>
-    
+    <div class="overlay"></div> 
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuTrigger = document.querySelector('.site-header__menu-trigger');
+        const body = document.querySelector('body');
+
+        menuTrigger.addEventListener('click', function() {
+          body.classList.toggle('no-scroll');
+          body.classList.toggle('mobile-menu-active'); // Add this line
+        });
+      });
+    </script>
   </header>
+</body>
+
+</html>

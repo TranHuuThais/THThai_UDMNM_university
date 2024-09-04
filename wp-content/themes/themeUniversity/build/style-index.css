@@ -1335,6 +1335,7 @@ body.admin-bar .search-overlay {
 }
 .event-summary__title a {
   color: #173f58;
+  text-decoration: none;
 }
 .event-summary__date {
   text-decoration: none;

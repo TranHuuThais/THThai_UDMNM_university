@@ -18,6 +18,7 @@ get_header(); ?>
             <?php
             if (is_category()) {
                 echo get_the_archive_title();
+                echo get_the_archive_description();
             }
             ?>
         </h1>

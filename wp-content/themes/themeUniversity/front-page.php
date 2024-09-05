@@ -56,8 +56,6 @@ get_header();
                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
               </h5>
               <p><?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?> <a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a></p>
-            
-             
             </div>
           </div>
 
@@ -136,7 +134,7 @@ get_header();
             <div class="hero-slider__interior container">
               <div class="hero-slider__overlay">
                 <h2 class="headline headline--medium t-center"><?php the_title(); ?></h2>
-                <h3 class="t-center"><?php echo wp_trim_words(get_the_excerpt(), 15, '...'); ?></>
+                <h3 class="t-center"><?php echo wp_trim_words(get_the_excerpt(), 10, '...'); ?></>
                   <p class="t-center no-margin"><a href="<?php the_permalink(); ?>" class="btn btn--blue">Learn more</a></p>
               </div>
             </div>

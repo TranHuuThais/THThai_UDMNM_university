@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The template for displaying archive pages
  *
@@ -50,29 +51,44 @@ get_header(); ?>
                     <?php the_title(sprintf('<h2 class="entry-title default-max-width"><a href="%s">', esc_url(get_permalink())), '</a></h2>'); ?>
                 <?php endif; ?>
 
-                <?php twenty_twenty_one_post_thumbnail(); ?>
+                <?php if (has_post_thumbnail()) : ?>
+                    <div class="post-thumbnail">
+                        <?php the_post_thumbnail('full'); // 'full' có thể thay bằng kích thước ảnh bạn muốn 
+                        ?>
+                    </div>
+                <?php endif; ?>
             </header><!-- .entry-header -->
 
             <div class="entry-content">
-                <?php
-                the_content(twenty_twenty_one_continue_reading_text());
-
-                wp_link_pages(array(
+                <?php the_excerpt(); ?>
+                <?php wp_link_pages(array(
                     'before'   => '<nav class="page-links" aria-label="' . esc_attr__('Page', 'twentytwentyone') . '">',
                     'after'    => '</nav>',
                     'pagelink' => esc_html__('Page %', 'twentytwentyone'),
-                ));
-                ?>
+                )); ?>
             </div><!-- .entry-content -->
 
             <footer class="entry-footer default-max-width">
-                <?php twenty_twenty_one_entry_meta_footer(); ?>
+                <div class="entry-meta">
+                    <?php
+                    if ('post' === get_post_type()) :
+                        // Display the post date and author.
+                        echo '<span class="posted-on">' . esc_html(get_the_date()) . '</span>';
+                        echo '<span class="byline"> by ' . esc_html(get_the_author()) . '</span>';
+                    endif;
+
+                    // Display categories and tags.
+                    echo '<div class="cat-links">' . get_the_category_list(', ') . '</div>';
+                    echo '<div class="tag-links">' . get_the_tag_list('', ', ') . '</div>';
+                    ?>
+                </div><!-- .entry-meta -->
             </footer><!-- .entry-footer -->
         </article><!-- #post-<?php the_ID(); ?> -->
 
+
     <?php endwhile; ?>
 
-    <?php twenty_twenty_one_the_posts_navigation(); ?>
+    <?php the_posts_navigation(); ?>
 
 <?php else : ?>
     <?php get_template_part('template-parts/content/content-none'); ?>

@@ -1,220 +1,180 @@
 <?php
 
-function theme_style()
-{
+// Enqueue styles and scripts
+function theme_enqueue_assets() {
     wp_enqueue_style('index_university_font_google', "https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i");
     wp_enqueue_style('index_university_bootstrap', "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
-    wp_enqueue_style('index_university', get_theme_file_uri('build/index.css'));
-    wp_enqueue_style('index_university_extra', get_theme_file_uri('build/style-index.css'));
-    wp_enqueue_script('index_university_script-1', get_theme_file_uri('build/mobile.js'));
+    wp_enqueue_style('index_university', get_theme_file_uri('build/index.css'), array(), '1.0');
+    wp_enqueue_style('index_university_extra', get_theme_file_uri('build/style-index.css'), array(), '1.0');
+    wp_enqueue_script('index_university_script-1', get_theme_file_uri('build/mobile.js'), array(), '1.0', true);
     wp_enqueue_script('index_university_script', get_theme_file_uri('build/index.js'), array('jquery'), '1.0', true);
 }
-add_action('wp_enqueue_scripts', 'theme_style');
+add_action('wp_enqueue_scripts', 'theme_enqueue_assets');
 
-if (!function_exists('mytheme_register_nav_menu')) {
-    function mytheme_register_nav_menu()
-    {
-        register_nav_menus(array(
-            'primary_menu' => __('Menu chinh', 'themeUniversity'),
-            'footer_menu_1'  => __('Menu Footer_1', 'themeUniversity'),
-        ));
-    }
-    add_action('after_setup_theme', 'mytheme_register_nav_menu', 0);
+// Register navigation menus
+function mytheme_register_nav_menu() {
+    register_nav_menus(array(
+        'primary_menu' => __('Menu chính', 'themeUniversity'),
+        'footer_menu_1' => __('Menu Footer_1', 'themeUniversity'),
+    ));
 }
+add_action('after_setup_theme', 'mytheme_register_nav_menu');
 
+// Add support for post thumbnails
 add_theme_support('post-thumbnails');
 
 
-
-function custom_paginate_links()
-{
+// Custom pagination
+function custom_paginate_links() {
     $args = array(
-        'prev_text' => '<span class="pagination-previous">Previous</span>',
-        'next_text' => '<span class="pagination-next">Next</span>',
+        'prev_text' => '<span class="pagination-previous">Trước</span>',
+        'next_text' => '<span class="pagination-next">Sau</span>',
     );
     echo '<div class="custom-paginate-links">';
     echo paginate_links($args);
     echo '</div>';
 }
 
-function create_event_post_type()
-{
-    $labels = array(
-        'name' => 'Events',
-        'singular_name' => 'Event',
-        'menu_name' => 'Events',
+// Register custom post types
+function create_custom_post_types() {
+    // Event Post Type
+    $event_labels = array(
+        'name' => 'Sự kiện',
+        'singular_name' => 'Sự kiện',
+        'menu_name' => 'Sự kiện',
     );
-
-    $args = array(
-        'labels' => $labels,
+    $event_args = array(
+        'labels' => $event_labels,
         'public' => true,
         'has_archive' => true,
-        'supports' => array('title', 'editor', 'thumbnail', 'custom-fields'),
-        'show_in_rest' => true, // Thêm dòng này để hỗ trợ REST API
+        'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-calendar',
     );
+    register_post_type('event', $event_args);
 
-    register_post_type('event', $args);
-
-    add_action('add_meta_boxes', 'add_event_date_metabox');
-    add_action('save_post', 'save_event_date', 10, 2);
-}
-add_action('init', 'create_event_post_type');
-
-function add_event_date_metabox()
-{
-    add_meta_box(
-        'event_date_metabox',
-        'Event Date',
-        'event_date_metabox_callback',
-        'event',
-        'normal',
-        'high'
-    );
-}
-
-function event_date_metabox_callback($post)
-{
-    $event_date = get_post_meta($post->ID, 'event_date', true);
-?>
-    <label for="event_date">Event Date:</label>
-    <input type="date" id="event_date" name="event_date" value="<?php echo $event_date; ?>">
-<?php
-}
-
-function save_event_date($post_id, $post)
-{
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-        return;
-    }
-
-    if (!current_user_can('edit_post', $post_id)) {
-        return;
-    }
-
-    if (isset($_POST['event_date'])) {
-        update_post_meta($post_id, 'event_date', sanitize_text_field($_POST['event_date']));
-    }
-}
-
-// end custom type post event
-
-// Custom post type blog
-function create_blog_post_type()
-{
-    $labels = array(
+    // Blog Post Type
+    $blog_labels = array(
         'name' => 'Blogs',
         'singular_name' => 'Blog',
         'menu_name' => 'Blogs',
     );
+    $blog_args = array(
+        'labels' => $blog_labels,
+        'public' => true,
+        'has_archive' => true,
+        'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-admin-post',
+    );
+    register_post_type('blog', $blog_args);
 
-    $args = array(
-        'labels' => $labels,
+    // Slides Post Type
+    $slides_labels = array(
+        'name' => 'Slides',
+        'singular_name' => 'Slide',
+        'menu_name' => 'Slides',
+        'add_new' => 'Add New',
+        'add_new_item' => 'Add New Slide',
+        'new_item' => 'New Slide',
+        'edit_item' => 'Edit Slide',
+        'view_item' => 'View Slide',
+        'all_items' => 'All Slides',
+        'search_items' => 'Search Slides',
+        'not_found' => 'No slides found.',
+        'not_found_in_trash' => 'No slides found in Trash.',
+    );
+    $slides_args = array(
+        'labels' => $slides_labels,
         'public' => true,
         'has_archive' => true,
         'supports' => array('title', 'editor', 'thumbnail'),
-        'show_in_rest' => true, // Thêm dòng này để hỗ trợ REST API
+        'show_in_rest' => true,
+        'menu_icon' => 'dashicons-format-gallery',
     );
+    register_post_type('slides', $slides_args);
 
-    register_post_type('blog', $args);
-}
-add_action('init', 'create_blog_post_type');
+    // Custom Taxonomies
+    $event_category_labels = array(
+        'name' => _x('Danh mục Sự kiện', 'taxonomy general name', 'themeUniversity'),
+        'singular_name' => _x('Danh mục Sự kiện', 'taxonomy singular name', 'themeUniversity'),
+        'search_items' => __('Tìm kiếm Danh mục Sự kiện', 'themeUniversity'),
+        'all_items' => __('Tất cả Danh mục Sự kiện', 'themeUniversity'),
+        'parent_item' => __('Danh mục Sự kiện cha', 'themeUniversity'),
+        'parent_item_colon' => __('Danh mục Sự kiện cha:', 'themeUniversity'),
+        'edit_item' => __('Sửa Danh mục Sự kiện', 'themeUniversity'),
+        'update_item' => __('Cập nhật Danh mục Sự kiện', 'themeUniversity'),
+        'add_new_item' => __('Thêm Danh mục Sự kiện mới', 'themeUniversity'),
+        'new_item_name' => __('Tên Danh mục Sự kiện mới', 'themeUniversity'),
+        'menu_name' => __('Danh mục Sự kiện', 'themeUniversity'),
+    );
+    $event_category_args = array(
+        'hierarchical' => true,
+        'labels' => $event_category_labels,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'query_var' => true,
+        'rewrite' => array('slug' => 'event-category'),
+    );
+    register_taxonomy('event_category', array('event'), $event_category_args);
 
-// end custom type post blog
-
-/// Đảm bảo hỗ trợ hình thu nhỏ, phân loại và định dạng bài viết
-function my_theme_setup()
-{
-    add_theme_support('post-thumbnails');
-    add_theme_support('post-formats', array('aside', 'gallery', 'quote', 'video'));
-    add_theme_support('custom-background');
-    add_theme_support('custom-header');
-
-    register_nav_menus(array(
-        'primary_menu' => __('Primary Menu', 'themeUniversity'),
-    ));
-}
-add_action('after_setup_theme', 'my_theme_setup');
-
-
-// Tạo các phân loại tùy chỉnh
-function create_custom_taxonomies()
-{
-    // Danh mục tùy chỉnh
+    // Custom Taxonomies for Posts
     register_taxonomy(
         'custom_category',
         'post',
         array(
-            'label' => __('Custom Categories'),
+            'label' => __('Danh mục Tùy chỉnh'),
             'rewrite' => array('slug' => 'custom-category'),
             'hierarchical' => true,
         )
     );
-
-    // Thẻ tùy chỉnh
     register_taxonomy(
         'custom_tag',
         'post',
         array(
-            'label' => __('Custom Tags'),
+            'label' => __('Thẻ Tùy chỉnh'),
             'rewrite' => array('slug' => 'custom-tag'),
             'hierarchical' => false,
         )
     );
 }
-add_action('init', 'create_custom_taxonomies');
+add_action('init', 'create_custom_post_types');
 
-
-function add_event_meta_boxes()
-{
-    add_meta_box(
-        'event_date_metabox',
-        'Event Date',
-        'event_date_metabox_callback',
-        'event',
-        'normal',
-        'high'
-    );
-
-    add_meta_box(
-        'event_location_metabox',
-        'Event Location',
-        'event_location_metabox_callback',
-        'event',
-        'normal',
-        'high'
-    );
-
-    add_meta_box(
-        'event_time_metabox',
-        'Event Time',
-        'event_time_metabox_callback',
-        'event',
-        'normal',
-        'high'
-    );
+// Add meta boxes for Events
+function add_event_meta_boxes() {
+    add_meta_box('event_date_metabox', 'Ngày Sự kiện', 'event_date_metabox_callback', 'event', 'normal', 'high');
+    add_meta_box('event_location_metabox', 'Địa điểm Sự kiện', 'event_location_metabox_callback', 'event', 'normal', 'high');
+    add_meta_box('event_time_metabox', 'Thời gian Sự kiện', 'event_time_metabox_callback', 'event', 'normal', 'high');
 }
 add_action('add_meta_boxes', 'add_event_meta_boxes');
 
-function event_location_metabox_callback($post)
-{
-    $event_location = get_post_meta($post->ID, 'event_location', true);
-?>
-    <label for="event_location">Event Location:</label>
-    <input type="text" id="event_location" name="event_location" value="<?php echo esc_attr($event_location); ?>">
-<?php
+function event_date_metabox_callback($post) {
+    wp_nonce_field('save_event_meta_boxes', 'event_meta_nonce');
+    $event_date = get_post_meta($post->ID, 'event_date', true);
+    echo '<label for="event_date">Ngày Sự kiện:</label>';
+    echo '<input type="date" id="event_date" name="event_date" value="' . esc_attr($event_date) . '">';
 }
 
-function event_time_metabox_callback($post)
-{
-    $event_time = get_post_meta($post->ID, 'event_time', true);
-?>
-    <label for="event_time">Event Time:</label>
-    <input type="time" id="event_time" name="event_time" value="<?php echo esc_attr($event_time); ?>">
-<?php
+function event_location_metabox_callback($post) {
+    wp_nonce_field('save_event_meta_boxes', 'event_meta_nonce');
+    $event_location = get_post_meta($post->ID, 'event_location', true);
+    echo '<label for="event_location">Địa điểm Sự kiện:</label>';
+    echo '<input type="text" id="event_location" name="event_location" value="' . esc_attr($event_location) . '">';
 }
-function save_event_meta_boxes($post_id)
-{
+
+function event_time_metabox_callback($post) {
+    wp_nonce_field('save_event_meta_boxes', 'event_meta_nonce');
+    $event_time = get_post_meta($post->ID, 'event_time', true);
+    echo '<label for="event_time">Thời gian Sự kiện:</label>';
+    echo '<input type="time" id="event_time" name="event_time" value="' . esc_attr($event_time) . '">';
+}
+
+function save_event_meta_boxes($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    if (!isset($_POST['event_meta_nonce']) || !wp_verify_nonce($_POST['event_meta_nonce'], 'save_event_meta_boxes')) {
         return;
     }
 
@@ -225,16 +185,45 @@ function save_event_meta_boxes($post_id)
     if (isset($_POST['event_date'])) {
         update_post_meta($post_id, 'event_date', sanitize_text_field($_POST['event_date']));
     }
-
     if (isset($_POST['event_location'])) {
         update_post_meta($post_id, 'event_location', sanitize_text_field($_POST['event_location']));
     }
-
     if (isset($_POST['event_time'])) {
         update_post_meta($post_id, 'event_time', sanitize_text_field($_POST['event_time']));
     }
 }
 add_action('save_post', 'save_event_meta_boxes');
 
+// Add meta boxes for Slides
+function add_slides_meta_boxes() {
+    add_meta_box('slide_link_metabox', 'Slide Link', 'slide_link_metabox_callback', 'slides', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'add_slides_meta_boxes');
+
+function slide_link_metabox_callback($post) {
+    wp_nonce_field('save_slides_meta_boxes', 'slides_meta_nonce');
+    $slide_link = get_post_meta($post->ID, 'slide_link', true);
+    echo '<label for="slide_link">Slide Link:</label>';
+    echo '<input type="url" id="slide_link" name="slide_link" value="' . esc_url($slide_link) . '">';
+}
+
+function save_slides_meta_boxes($post_id) {
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    if (!isset($_POST['slides_meta_nonce']) || !wp_verify_nonce($_POST['slides_meta_nonce'], 'save_slides_meta_boxes')) {
+        return;
+    }
+
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    if (isset($_POST['slide_link'])) {
+        update_post_meta($post_id, 'slide_link', esc_url_raw($_POST['slide_link']));
+    }
+}
+add_action('save_post', 'save_slides_meta_boxes');
 
 ?>
